@@ -1,0 +1,17 @@
+apiVersion: config.tf.mirantis.com/v1alpha1
+kind: TFConfig
+metadata:
+  name: tfconfig-api
+spec:
+  size: 1
+  configmaps: 
+    - tf-rabbitmq-cfgmap
+  api:
+    replicas: 1
+    image: willco/opencontrail-config-api:r5.1
+    ports:
+      - name: api
+        port: 9100
+      - name: introspect
+        port: 8084
+
