@@ -13,8 +13,31 @@ type Port struct {
 	Port int32  `json:"port"`
 }
 
-// TFConfigAPISpec defines the desired state of config api service API
+// TFConfigAPISpec defines the desired state of config api service
 type TFConfigAPISpec struct {
+	Enabled  bool   `json:"enabled,omitempty"`
+	Replicas *int32 `json:"replicas"`
+	Image    string `json:"image"`
+	Ports    []Port `json:"ports,omitempty"`
+}
+
+// TFConfigSVCMonitorSpec defines the desired state of config service monitor
+type TFConfigSVCMonitorSpec struct {
+	Enabled  bool   `json:"enabled,omitempty"`
+	Replicas *int32 `json:"replicas"`
+	Image    string `json:"image"`
+	Ports    []Port `json:"ports,omitempty"`
+}
+
+// TFConfigSchemaSpec defines the desired state of config schema
+type TFConfigSchemaSpec struct {
+	Enabled  bool   `json:"enabled,omitempty"`
+	Replicas *int32 `json:"replicas"`
+	Image    string `json:"image"`
+}
+
+// TFConfigDeviceMgr defines the desired state of config device manager
+type TFConfigDeviceMgr struct {
 	Enabled  bool   `json:"enabled,omitempty"`
 	Replicas *int32 `json:"replicas"`
 	Image    string `json:"image"`
@@ -23,8 +46,11 @@ type TFConfigAPISpec struct {
 
 // TFConfigSpec defines the desired state of TFConfig
 type TFConfigSpec struct {
-	APISpec      TFConfigAPISpec `json:"api"`
-	CofigMapList []string        `json:"configmaps,omitempty"`
+	APISpec        TFConfigAPISpec        `json:"api"`
+	SVCMonitorSpec TFConfigSVCMonitorSpec `json:"svc-monitor"`
+	SchemaSpec     TFConfigSchemaSpec     `json:"schema"`
+	DeviceMgrSpec  TFConfigDeviceMgr      `json:"devicemgr"`
+	CofigMapList   []string               `json:"configmaps,omitempty"`
 }
 
 // TFConfigStatus defines the observed state of TFConfig

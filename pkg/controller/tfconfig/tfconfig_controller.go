@@ -77,6 +77,13 @@ type ReconcileTFConfig struct {
 	reqLogger logr.Logger
 }
 
+// Hndl is Structure for handler for function for extend params
+type Hndl struct {
+	Name    string
+	Func    func() (bool, error)
+	Enabled bool
+}
+
 // Reconcile reads that state of the cluster for a TFConfig object and makes changes based on the state read
 // and what is in the TFConfig.Spec
 // TODO(user): Modify this Reconcile function to implement your Controller logic.  This example creates
@@ -107,23 +114,89 @@ func (r *ReconcileTFConfig) Reconcile(request reconcile.Request) (reconcile.Resu
 	}
 	r.reqLogger.Info(fmt.Sprintf("List of available ConfigMaps: %s", r.instance.Status.ConfigMapList))
 
-	// Handle API deployment
-	requeue, err := r.handleAPIDeployment()
-	if err != nil {
-		return reconcile.Result{}, err
-	}
-	if requeue {
-		return reconcile.Result{Requeue: true}, nil
-	}
+	var handlerList []Hndl
+	handlerList = append(handlerList, Hndl{Name: "ApiDeployment", Func: r.handleAPIDeployment, Enabled: r.instance.Spec.APISpec.Enabled})
+	handlerList = append(handlerList, Hndl{Name: "ApiService", Func: r.handleAPIService, Enabled: r.instance.Spec.APISpec.Enabled})
+	handlerList = append(handlerList, Hndl{Name: "SVCMonitorDeployment", Func: r.handleSVCMonitorDeployment, Enabled: r.instance.Spec.SVCMonitorSpec.Enabled})
+	handlerList = append(handlerList, Hndl{Name: "SVCMonitorService", Func: r.handleSVCMonitorService, Enabled: r.instance.Spec.SVCMonitorSpec.Enabled})
+	handlerList = append(handlerList, Hndl{Name: "SchemaDeployment", Func: r.handleSchemaDeployment, Enabled: r.instance.Spec.SchemaSpec.Enabled})
+	handlerList = append(handlerList, Hndl{Name: "DeviceMgrDeployment", Func: r.handleDeviceMgrDeployment, Enabled: r.instance.Spec.DeviceMgrSpec.Enabled})
+	handlerList = append(handlerList, Hndl{Name: "DeviceMgrService", Func: r.handleDeviceMgrService, Enabled: r.instance.Spec.DeviceMgrSpec.Enabled})
 
-	// Handle API Service
-	requeue, err = r.handleAPIService()
-	if err != nil {
-		return reconcile.Result{}, err
+	for _, handler := range handlerList {
+		if !handler.Enabled {
+			continue
+		}
+		requeue, err := handler.Func()
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		if requeue {
+			return reconcile.Result{Requeue: true}, nil
+		}
 	}
-	if requeue {
-		return reconcile.Result{Requeue: true}, nil
-	}
+	// // Handle API deployment
+	// requeue, err := r.handleAPIDeployment()
+	// if err != nil {
+	// 	return reconcile.Result{}, err
+	// }
+	// if requeue {
+	// 	return reconcile.Result{Requeue: true}, nil
+	// }
+
+	// // Handle API Service
+	// requeue, err = r.handleAPIService()
+	// if err != nil {
+	// 	return reconcile.Result{}, err
+	// }
+	// if requeue {
+	// 	return reconcile.Result{Requeue: true}, nil
+	// }
+
+	// // Handle SVCMonitor deployment
+	// requeue, err = r.handleSVCMonitorDeployment()
+	// if err != nil {
+	// 	return reconcile.Result{}, err
+	// }
+	// if requeue {
+	// 	return reconcile.Result{Requeue: true}, nil
+	// }
+
+	// // Handle SVCMonitor Service
+	// requeue, err = r.handleSVCMonitorService()
+	// if err != nil {
+	// 	return reconcile.Result{}, err
+	// }
+	// if requeue {
+	// 	return reconcile.Result{Requeue: true}, nil
+	// }
+
+	// // Handle Schema deployment
+	// requeue, err = r.handleSchemaDeployment()
+	// if err != nil {
+	// 	return reconcile.Result{}, err
+	// }
+	// if requeue {
+	// 	return reconcile.Result{Requeue: true}, nil
+	// }
+
+	// // Handle DeviceMgr deployment
+	// requeue, err = r.handleDeviceMgrDeployment()
+	// if err != nil {
+	// 	return reconcile.Result{}, err
+	// }
+	// if requeue {
+	// 	return reconcile.Result{Requeue: true}, nil
+	// }
+
+	// // Handle DeviceMgr Service
+	// requeue, err = r.handleDeviceMgrService()
+	// if err != nil {
+	// 	return reconcile.Result{}, err
+	// }
+	// if requeue {
+	// 	return reconcile.Result{Requeue: true}, nil
+	// }
 
 	return reconcile.Result{}, nil
 }

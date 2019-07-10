@@ -15,3 +15,20 @@ spec:
       - name: introspect
         port: 8084
 
+  svc-monitor:
+    replicas: 1
+    image: willco/opencontrail-config-svc-monitor:r5.1
+    ports:
+      - name: introspect
+        port: 8088
+
+  schema:
+    replicas: 1
+    image: willco/opencontrail-config-schema:r5.1
+
+  devicemgr:
+    replicas: 1
+    image: willco/opencontrail-config-devicemgr:r5.1
+    ports:
+      - name: introspect
+        port: 8087
