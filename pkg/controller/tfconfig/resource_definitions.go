@@ -36,6 +36,18 @@ func getContainerPortObject(portList []configv1alpha1.Port) []corev1.ContainerPo
 	return list
 }
 
+func getEnvVariablesObject(envs []configv1alpha1.EnvVar) []corev1.EnvVar {
+	var list []corev1.EnvVar
+	for _, e := range envs {
+		eobj := &corev1.EnvVar{
+			Name:  e.Name,
+			Value: e.Value,
+		}
+		list = append(list, *eobj)
+	}
+	return list
+}
+
 func getServicePortObject(portList []configv1alpha1.Port) []corev1.ServicePort {
 	var list []corev1.ServicePort
 	for _, p := range portList {
@@ -93,7 +105,11 @@ func newDeploymentForAPI(cr *configv1alpha1.TFConfig) *betav1.Deployment {
 			{Name: "introspect", ContainerPort: 8084},
 		}
 	}
-
+	// set environment variable(s) if defined in spec
+	envs := getEnvVariablesObject(cr.Spec.APISpec.EnvList)
+	if len(envs) > 0 {
+		deploy.Spec.Template.Spec.Containers[0].Env = envs
+	}
 	return deploy
 }
 

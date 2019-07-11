@@ -13,12 +13,19 @@ type Port struct {
 	Port int32  `json:"port"`
 }
 
+// EnvVar defines Environment sariable
+type EnvVar struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
 // TFConfigAPISpec defines the desired state of config api service
 type TFConfigAPISpec struct {
-	Enabled  bool   `json:"enabled,omitempty"`
-	Replicas *int32 `json:"replicas"`
-	Image    string `json:"image"`
-	Ports    []Port `json:"ports,omitempty"`
+	Enabled  bool     `json:"enabled,omitempty"`
+	Replicas *int32   `json:"replicas"`
+	Image    string   `json:"image"`
+	Ports    []Port   `json:"ports,omitempty"`
+	EnvList  []EnvVar `json:"env"`
 }
 
 // TFConfigSVCMonitorSpec defines the desired state of config service monitor
