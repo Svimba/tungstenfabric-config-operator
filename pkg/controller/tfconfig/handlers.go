@@ -2,6 +2,7 @@ package tfconfig
 
 import (
 	"context"
+	"fmt"
 
 	betav1 "k8s.io/api/apps/v1beta1"
 	corev1 "k8s.io/api/core/v1"
@@ -33,6 +34,18 @@ func (r *ReconcileTFConfig) handleAPIDeployment() (bool, error) {
 		return false, nil
 	} else if err != nil {
 		return false, err
+	}
+
+	// Check replicas of the deployment, update if needed
+	if *foundAPIDeploy.Spec.Replicas != *r.instance.Spec.APISpec.Replicas {
+		r.reqLogger.Info(fmt.Sprintf("Current replicas: %d  Desired: %d reconfiguring...", int(*foundAPIDeploy.Spec.Replicas), int(*r.instance.Spec.APISpec.Replicas)))
+		foundAPIDeploy.Spec.Replicas = r.instance.Spec.APISpec.Replicas
+		err = r.client.Update(context.TODO(), foundAPIDeploy)
+		if err != nil {
+			r.reqLogger.Error(err, "Cannot update replicas for deployment:", foundAPIDeploy.Name)
+			return false, err
+		}
+		r.reqLogger.Info("Replicas have been changed")
 	}
 	// Deployment already exists - don't requeue
 	r.reqLogger.Info("Skip reconcile: API Deployment already exists", "Deploy.Namespace", foundAPIDeploy.Namespace, "Deploy.Name", foundAPIDeploy.Name)
