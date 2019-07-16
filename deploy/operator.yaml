@@ -12,7 +12,7 @@ spec:
       labels:
         name: tungstenfabric-config-operator
     spec:
-      serviceAccountName: tungstenfabric-config-operator
+      serviceAccountName: tungstenfabric-operator
       containers:
         - name: tungstenfabric-config-operator
           # Replace this with the built image name

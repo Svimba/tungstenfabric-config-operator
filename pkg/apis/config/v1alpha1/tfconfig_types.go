@@ -43,8 +43,8 @@ type TFConfigSchemaSpec struct {
 	Image    string `json:"image"`
 }
 
-// TFConfigDeviceMgr defines the desired state of config device manager
-type TFConfigDeviceMgr struct {
+// TFConfigDeviceMgrSpec defines the desired state of config device manager
+type TFConfigDeviceMgrSpec struct {
 	Enabled  bool   `json:"enabled,omitempty"`
 	Replicas *int32 `json:"replicas"`
 	Image    string `json:"image"`
@@ -56,7 +56,7 @@ type TFConfigSpec struct {
 	APISpec        TFConfigAPISpec        `json:"api"`
 	SVCMonitorSpec TFConfigSVCMonitorSpec `json:"svc-monitor"`
 	SchemaSpec     TFConfigSchemaSpec     `json:"schema"`
-	DeviceMgrSpec  TFConfigDeviceMgr      `json:"devicemgr"`
+	DeviceMgrSpec  TFConfigDeviceMgrSpec  `json:"devicemgr"`
 	CofigMapList   []string               `json:"configmaps,omitempty"`
 }
 
